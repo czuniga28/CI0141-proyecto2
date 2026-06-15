@@ -1,1 +1,1 @@
-"""Extract layer: connectors that load raw source data into staging."""
+"""Extract layer: clean staging and connectors that load raw source data into staging."""

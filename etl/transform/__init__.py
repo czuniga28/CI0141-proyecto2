@@ -1,1 +1,1 @@
-"""Transform layer: cleaning and preparation of staging tables."""
+"""Transform layer: data cleanup and conversion."""
