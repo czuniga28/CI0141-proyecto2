@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from etl.load_csv_to_staging import SOURCE_COLUMNS, iter_csv_rows, project_row
+from etl.extract.csv_source import SOURCE_COLUMNS, iter_csv_rows, project_row
 
 
 class LoadCsvToStagingTests(unittest.TestCase):
