@@ -5,13 +5,9 @@ from __future__ import annotations
 import sys
 from collections.abc import Callable
 
-from etl import (
-    clean_staging,
-    load_external_to_staging,
-)
 from etl.config import EtlConfig, load_config
 from etl.extract import csv_source, json_source, relational_source
-from etl.transform import clean_staging
+from etl.extract import clean_staging
 
 
 EtlStep = tuple[str, Callable[[EtlConfig], None]]
