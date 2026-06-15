@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 from etl.config import EtlConfig
-
-
-TARGET_TABLE = "staging.encuesta_enfasis_raw"
+from etl.extract.common import TARGET_TABLE
 
 
 def run(config: EtlConfig) -> None:
