@@ -1,14 +1,14 @@
-"""Load the mocked external SQL source into raw staging."""
+"""Shared constants and helpers for extract modules.
+
+All sources land in the same raw staging table, columns shared with the
+"encuesta_enfasis" schema (preprocessed_data/) common to the 3 sources
+(CSV, relational mock DB, JSON/API mock).
+"""
 
 from __future__ import annotations
 
-from etl.config import EtlConfig
 
-
-SOURCE_TYPE = "BD_RELACIONAL"
-SOURCE_TABLE = "public.external_db"
 TARGET_TABLE = "staging.encuesta_enfasis_raw"
-ORIGIN_FILE = "encuesta_enfasis_external_db.sql"
 
 SOURCE_COLUMNS = [
     "term",
@@ -51,7 +51,6 @@ SOURCE_COLUMNS = [
     "useful_iti_industry_talk",
     "useful_is_industry_talk",
     "useful_admin_myths_talk",
-    "useful_admin_talk",
     "low_usefulness_comment",
     "chosen_emphasis",
     "difficulty_cycle_1",
@@ -92,44 +91,14 @@ SOURCE_COLUMNS = [
 ]
 
 
-def _get_source_id(cursor) -> int:
+def get_source_id(cursor, source_type: str) -> int:
+    """Look up the dw.dim_fuente_datos surrogate key for a source type."""
+
     cursor.execute(
         "SELECT id_fuente FROM dw.dim_fuente_datos WHERE tipo = %s",
-        (SOURCE_TYPE,),
+        (source_type,),
     )
     row = cursor.fetchone()
     if row is None:
-        raise RuntimeError(f"Missing dw.dim_fuente_datos row for tipo={SOURCE_TYPE}")
+        raise RuntimeError(f"Missing dw.dim_fuente_datos row for tipo={source_type}")
     return row[0]
-
-
-def run(config: EtlConfig) -> None:
-    """Copy rows from public.external_db into staging.encuesta_enfasis_raw."""
-
-    import psycopg
-
-    target_columns = ["id_fuente", "archivo_origen", *SOURCE_COLUMNS]
-    select_columns = ",\n            ".join(f"{column}::TEXT" for column in SOURCE_COLUMNS)
-    insert_sql = f"""
-        INSERT INTO {TARGET_TABLE} (
-            {", ".join(target_columns)}
-        )
-        SELECT
-            %s,
-            %s,
-            {select_columns}
-        FROM {SOURCE_TABLE}
-    """
-
-    with psycopg.connect(**config.connection_kwargs()) as conn:
-        with conn.cursor() as cur:
-            source_id = _get_source_id(cur)
-            cur.execute(
-                f"DELETE FROM {TARGET_TABLE} WHERE id_fuente = %s AND archivo_origen = %s",
-                (source_id, ORIGIN_FILE),
-            )
-            cur.execute(insert_sql, (source_id, ORIGIN_FILE))
-            inserted = cur.rowcount
-        conn.commit()
-
-    print(f"Loaded {inserted} rows from {SOURCE_TABLE} into {TARGET_TABLE}")

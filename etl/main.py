@@ -5,20 +5,21 @@ from __future__ import annotations
 import sys
 from collections.abc import Callable
 
-from etl import clean_staging, external_db, load_external_to_staging
 from etl.config import EtlConfig, load_config
+from etl.extract import json_source, relational_source
+from etl.transform import clean_staging
 
 
 EtlStep = tuple[str, Callable[[EtlConfig], None]]
 
 
 ETL_STEPS: list[EtlStep] = [
-    ("external_db", external_db.run),
+    ("relational_setup_mock_source", relational_source.setup_mock_source),
     ("clean_raw_staging", clean_staging.run),
-    ("external_db_to_raw_staging", load_external_to_staging.run),
+    ("relational_extract_to_staging", relational_source.extract_to_staging),
+    ("json_extract_to_staging", json_source.extract_to_staging),
     # Future source modules can be added here:
-    # ("csv_source", load_csv_source.run),
-    # ("json_source", load_json_source.run),
+    # ("csv_extract_to_staging", csv_source.extract_to_staging),
 ]
 
 
