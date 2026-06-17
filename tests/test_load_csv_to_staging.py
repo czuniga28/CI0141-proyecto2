@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from etl.extract.csv_source import SOURCE_COLUMNS, iter_csv_rows, project_row
+from etl.extract.csv_source import STAGING_COLUMNS, iter_csv_rows, project_row
 
 
 class LoadCsvToStagingTests(unittest.TestCase):
@@ -15,7 +15,7 @@ class LoadCsvToStagingTests(unittest.TestCase):
             "useful_roundtable": "4",
         }
 
-        projected = dict(zip(SOURCE_COLUMNS, project_row(row), strict=True))
+        projected = dict(zip(STAGING_COLUMNS, project_row(row), strict=True))
 
         self.assertEqual(projected["activities_influenced"], "Si")
         self.assertEqual(projected["impact_cc_industry_talk"], "5 - Muy util")
@@ -29,7 +29,7 @@ class LoadCsvToStagingTests(unittest.TestCase):
         rows = list(iter_csv_rows(csv_path))
 
         self.assertEqual(len(rows), 269)
-        self.assertTrue(all(len(row) == len(SOURCE_COLUMNS) for row in rows))
+        self.assertTrue(all(len(row) == len(STAGING_COLUMNS) for row in rows))
 
 
 if __name__ == "__main__":
