@@ -67,24 +67,35 @@ Pasos ejecutados en orden (`etl/main.py` → `ETL_STEPS`):
    de `preprocessed_data/encuesta_enfasis_external_db.sql` (mock de la fuente
    relacional on-premise).
 2. `clean_raw_staging` — vacía `staging.encuesta_enfasis_raw`.
-3. `relational_extract_to_staging` — copia `public.external_db` →
+3. `csv_to_raw_staging` — carga `preprocessed_data/encuesta_enfasis.csv` →
+   `staging.encuesta_enfasis_raw` (fuente `CSV`).
+4. `relational_extract_to_staging` — copia `public.external_db` →
    `staging.encuesta_enfasis_raw` (fuente `BD_RELACIONAL`).
-4. `json_extract_to_staging` — carga
+5. `json_extract_to_staging` — carga
    `preprocessed_data/encuesta_enfasis.json` → `staging.encuesta_enfasis_raw`
    (fuente `API`).
+6. `transform_dim_tiempo` — genera `dw.dim_tiempo` a partir de las fechas de
+   envío/inicio presentes en staging.
+7. `transform_load_facts` — limpia (full reload) y reconstruye todas las tablas
+   de hechos de `dw` desde staging, normalizando los valores, y registra la
+   corrida en `dw.fact_auditoria`.
 
 ## 4. Estructura de `etl/`
 
 ```
 etl/
-├── config.py              # configuración (env vars) y conexión a Postgres
+├── config.py               # configuración (env vars) y conexión a Postgres
 ├── main.py                 # orquestador: corre ETL_STEPS en orden
 ├── extract/
 │   ├── common.py           # columnas compartidas (SOURCE_COLUMNS) + lookup de id_fuente
+│   ├── clean_staging.py    # limpieza de staging antes de extraer
+│   ├── csv_source.py       # extract del CSV a staging
 │   ├── relational_source.py# setup del mock relacional + extract a staging
 │   └── json_source.py      # extract del mock JSON/API a staging
 └── transform/
-    └── clean_staging.py     # limpieza de staging antes de extraer
+    ├── normalize.py        # parsers puros + mapeos columna→dimensión (testeable sin BD)
+    ├── dim_tiempo.py        # genera la dimensión tiempo desde staging
+    └── load_facts.py        # full reload de las tablas de hechos + auditoría
 ```
 
 ## 5. Probar los extractores individualmente
@@ -96,23 +107,28 @@ re-ejecutar todo el pipeline.
 ```bash
 python - <<'EOF'
 from etl.config import load_config
-from etl.extract import relational_source, json_source
-from etl.transform import clean_staging
+from etl.extract import clean_staging, csv_source, relational_source, json_source
+from etl.transform import dim_tiempo, load_facts
 
 config = load_config()
 
 clean_staging.run(config)                       # limpia staging
+csv_source.run(config)                          # extrae fuente CSV
 relational_source.setup_mock_source(config)     # crea public.external_db
 relational_source.extract_to_staging(config)    # extrae fuente BD_RELACIONAL
 json_source.extract_to_staging(config)          # extrae fuente API (JSON)
+dim_tiempo.run(config)                           # pobla dw.dim_tiempo
+load_facts.run(config)                           # transforma + carga los hechos
 EOF
 ```
 
-Cada función imprime cuántas filas insertó y es **idempotente**: vuelve a
-correrla borra primero las filas previas de esa misma fuente
-(`id_fuente` + `archivo_origen`) antes de insertar.
+Cada función imprime cuántas filas insertó. Los extractores son **idempotentes**
+(borran primero las filas previas de esa misma fuente por `id_fuente` +
+`archivo_origen`); la carga de hechos hace **full reload** (trunca y reconstruye).
 
 ### Validar los resultados en la base
+
+Conteo por fuente en staging:
 
 ```bash
 docker compose exec dw psql -U etl_user -d ecci_dw -c "
@@ -126,10 +142,21 @@ Resultado esperado tras correr el pipeline completo:
 
 | id_fuente | archivo_origen | count |
 |---|---|---|
+| 1 (CSV) | `encuesta_enfasis.csv` | 269 |
 | 2 (BD_RELACIONAL) | `encuesta_enfasis_external_db.sql` | 238 |
 | 3 (API) | `encuesta_enfasis.json` | 96 |
 
 Los `id_fuente` provienen de `dw.dim_fuente_datos` (ver `sql/ddl/03_seeds.sql`).
+
+Hechos cargados y auditoría de la última corrida:
+
+```bash
+docker compose exec dw psql -U etl_user -d ecci_dw -c "
+  SELECT count(*) AS respuestas FROM dw.fact_respuesta;
+  SELECT estado, registros_insertados, registros_rechazados
+  FROM dw.fact_auditoria ORDER BY id_auditoria;
+"
+```
 
 ## 6. Servicios adicionales
 
