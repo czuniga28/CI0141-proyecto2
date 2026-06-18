@@ -19,7 +19,6 @@ _FACT_TABLES = [
     "dw.fact_dominio_conocimiento",
     "dw.fact_habilidad_blanda",
     "dw.fact_respuesta",
-    "dw.fact_auditoria",
 ]
 
 _INSERT_RESPUESTA = """

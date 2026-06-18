@@ -3,6 +3,16 @@ from datetime import date
 from decimal import Decimal
 
 from etl.transform import normalize as nz
+from etl.extract.common import SOURCE_COLUMNS
+from etl.transform.load_facts import _FACT_TABLES
+
+
+class TransformRegressionTests(unittest.TestCase):
+    def test_shared_extract_keeps_admin_talk_usefulness(self):
+        self.assertIn("useful_admin_talk", SOURCE_COLUMNS)
+
+    def test_fact_rebuild_does_not_delete_audit_history(self):
+        self.assertNotIn("dw.fact_auditoria", _FACT_TABLES)
 
 
 class ParseLikertTests(unittest.TestCase):
