@@ -51,6 +51,7 @@ SOURCE_COLUMNS = [
     "useful_iti_industry_talk",
     "useful_is_industry_talk",
     "useful_admin_myths_talk",
+    "useful_admin_talk",
     "low_usefulness_comment",
     "chosen_emphasis",
     "difficulty_cycle_1",
