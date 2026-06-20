@@ -105,6 +105,21 @@ CREATE TABLE dw.fact_habilidad_blanda (
 );
 
 -- -------------------------------------------------------------
+-- FactPerdidaCurso  (estudiantes que perdieron cursos por bloque y ciclo — simulado)
+-- -------------------------------------------------------------
+CREATE TABLE dw.fact_perdida_curso (
+    id_perdida      SERIAL PRIMARY KEY,
+    id_ciclo        INTEGER     NOT NULL REFERENCES dw.dim_ciclo(id_ciclo),
+    id_bloque       INTEGER     NOT NULL REFERENCES dw.dim_bloque_semestral(id_bloque),
+    matriculados    INTEGER     NOT NULL,
+    reprobados      INTEGER     NOT NULL,
+    tasa_reprobacion NUMERIC(5,2) GENERATED ALWAYS AS (
+        CASE WHEN matriculados > 0 THEN (reprobados * 100.0 / matriculados) ELSE 0 END
+    ) STORED,
+    UNIQUE (id_ciclo, id_bloque)
+);
+
+-- -------------------------------------------------------------
 -- FactAuditoria  (log de cargas ETL)
 -- -------------------------------------------------------------
 CREATE TABLE dw.fact_auditoria (
