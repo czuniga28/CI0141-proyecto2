@@ -111,22 +111,12 @@ Contenedores & Docker Compose & Reproducibilidad, aislamiento de servicios \\
 
 \subsection{Diagrama de arquitectura}
 
-\begin{verbatim}
-+------------------+     +------------------+     +------------------+
-|  Fuentes de      |     |   ETL Pipeline   |     |  Data Warehouse  |
-|  Datos           |     |   (Python)       |     |  (PostgreSQL)    |
-|                  |     |                  |     |                  |
-|  - CSV           +---->+  Extract         +---->+  staging.*       |
-|  - BD Relacional |     |  Transform       |     |  dw.dim_*        |
-|  - JSON/API      |     |  Load            |     |  dw.fact_*       |
-+------------------+     +------------------+     +--------+---------+
-                                                           |
-                                                           v
-                                                  +------------------+
-                                                  |   Metabase       |
-                                                  |   (Dashboards)   |
-                                                  +------------------+
-\end{verbatim}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/pipeline.png}
+    \caption{Arquitectura lógica de la solución}
+    \label{fig:arquitectura}
+\end{figure}
 
 % ===========================================================================
 \section{Fuentes de Datos}
