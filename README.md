@@ -74,9 +74,9 @@ Pasos ejecutados en orden (`etl/main.py` → `ETL_STEPS`):
 5. `json_extract_to_staging` — carga
    `preprocessed_data/encuesta_enfasis.json` → `staging.encuesta_enfasis_raw`
    (fuente `API`).
-6. `transform_dim_tiempo` — genera `dw.dim_tiempo` a partir de las fechas de
+6. `load_dim_tiempo` — genera `dw.dim_tiempo` a partir de las fechas de
    envío/inicio presentes en staging.
-7. `transform_load_facts` — limpia (full reload) y reconstruye todas las tablas
+7. `load_facts` — limpia (full reload) y reconstruye todas las tablas
    de hechos de `dw` desde staging, normalizando los valores, y registra la
    corrida en `dw.fact_auditoria`.
 
@@ -92,10 +92,11 @@ etl/
 │   ├── csv_source.py       # extract del CSV a staging
 │   ├── relational_source.py# setup del mock relacional + extract a staging
 │   └── json_source.py      # extract del mock JSON/API a staging
-└── transform/
-    ├── normalize.py        # parsers puros + mapeos columna→dimensión (testeable sin BD)
-    ├── dim_tiempo.py        # genera la dimensión tiempo desde staging
-    └── load_facts.py        # full reload de las tablas de hechos + auditoría
+├── transform/
+│   └── normalize.py        # parsers puros + mapeos columna→dimensión (testeable sin BD)
+└── load/
+    ├── dim_tiempo.py       # genera la dimensión tiempo desde staging
+    └── facts.py            # full reload de las tablas de hechos + auditoría
 ```
 
 ## 5. Probar los extractores individualmente
@@ -108,7 +109,7 @@ re-ejecutar todo el pipeline.
 python - <<'EOF'
 from etl.config import load_config
 from etl.extract import clean_staging, csv_source, relational_source, json_source
-from etl.transform import dim_tiempo, load_facts
+from etl.load import dim_tiempo, facts
 
 config = load_config()
 
@@ -118,7 +119,7 @@ relational_source.setup_mock_source(config)     # crea public.external_db
 relational_source.extract_to_staging(config)    # extrae fuente BD_RELACIONAL
 json_source.extract_to_staging(config)          # extrae fuente API (JSON)
 dim_tiempo.run(config)                           # pobla dw.dim_tiempo
-load_facts.run(config)                           # transforma + carga los hechos
+facts.run(config)                                # transforma + carga los hechos
 EOF
 ```
 
