@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Metabase
+metabase-data/metabase.db/*.trace.db
+metabase-data/metabase.db/*.lock.db
+metabase-data/metabase.db/*.tmp.db
