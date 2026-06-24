@@ -17,14 +17,39 @@ services:
       timeout: 5s
       retries: 5
 
+  metabase-db-init:
+    image: postgres:16-alpine
+    environment:
+      PGHOST: ecci_dw
+      PGPORT: 5432
+      PGUSER: etl_user
+      PGPASSWORD: etl_pass
+    depends_on:
+      dw:
+        condition: service_healthy
+    command:
+      - /bin/sh
+      - -c
+      - |
+        if ! psql -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = 'metabase'" | grep -q 1; then
+          createdb metabase
+        fi
+
   metabase:
     image: metabase/metabase:latest
     container_name: ecci_metabase
     ports:
       - "3000:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: etl_user
+      MB_DB_PASS: etl_pass
+      MB_DB_HOST: ecci_dw
     depends_on:
-      dw:
-        condition: service_healthy
+      metabase-db-init:
+        condition: service_completed_successfully
 
 volumes:
   dw_data:

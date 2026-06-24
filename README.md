@@ -165,4 +165,7 @@ docker compose up -d metabase
 ```
 
 Metabase queda disponible en [http://localhost:3000](http://localhost:3000),
-conectado al Data Warehouse (`dw`) para dashboards.
+conectado al Data Warehouse (`dw`) para dashboards. Antes de iniciar Metabase,
+el servicio `metabase-db-init` crea de forma idempotente la base `metabase`,
+donde Metabase guarda su configuración interna. Esto funciona también cuando
+el volumen de PostgreSQL ya existe.
