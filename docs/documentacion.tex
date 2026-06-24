@@ -452,6 +452,162 @@ Los reportes complementan y dan soporte analítico a los dashboards. Cada report
 
 Soporte del Dashboard 1. Resumen estadístico por ciclo: cantidad de estudiantes por énfasis, tasas de reprobación por curso, comparación con ciclos anteriores, y proyección de matrícula para el próximo ciclo. Incluye análisis de correlación entre reprobación en cursos del tronco común y la demanda posterior de cada énfasis.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/dashboard1_demanda_historica.png}
+    \caption{Demanda histórica por énfasis (2021--2025)}
+    \label{fig:dashboard1-demanda-historica}
+\end{figure}
+
+\subsubsection{Demanda histórica por énfasis (2021--2025)}
+
+La evolución de la cantidad de estudiantes que eligen cada énfasis muestra las siguientes tendencias (datos agregados por año):
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Énfasis} & \textbf{2021} & \textbf{2022} & \textbf{2023} & \textbf{2024} & \textbf{2025} \\
+\midrule
+Ingeniería de Software (IS) & 32 & 40 & 43 & 48 & 41 \\
+Ciencias de la Computación (CC) & 14 & 31 & 35 & 44 & 37 \\
+Ing. de Tecnologías de la Información (ITI) & 18 & 19 & 7 & 35 & 18 \\
+\bottomrule
+\end{tabular}
+\caption{Cantidad de estudiantes por énfasis y año}
+\end{table}
+
+\textbf{Nota:} El año 2021 solo cuenta con datos de II Ciclo. Los años 2022--2025 incluyen ambos ciclos lectivos (más un III Ciclo en 2022).
+
+\textbf{Hallazgos clave:}
+\begin{itemize}
+  \item Ingeniería de Software es siempre el énfasis más elegido, con un máximo de 48 estudiantes en 2024 y una leve baja a 41 en 2025.
+  \item Ciencias de la Computación muestra un crecimiento continuo desde 2021 (14) hasta 2024 (44), triplicando su demanda en tres años, con una pequeña baja en 2025.
+  \item Ingeniería de Tecnologías de la Información presenta la mayor variación: una caída fuerte a 7 estudiantes en 2023 (de los cuales solo 1 en II Ciclo), una recuperación a 35 en 2024, y un regreso a 18 en 2025.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{img/dashboard1_demanda_acumulada.png}
+    \caption{Demanda acumulada por énfasis, período 2021--2025}
+    \label{fig:dashboard1-demanda-acumulada}
+\end{figure}
+
+\subsubsection{Demanda acumulada (período 2021--2025)}
+
+La demanda total acumulada durante el período confirma el orden de preferencia:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Énfasis} & \textbf{Total estudiantes} & \textbf{Participación} \\
+\midrule
+Ingeniería de Software & 204 & 44.2\% \\
+Ciencias de la Computación & 161 & 34.8\% \\
+Ing. de Tecnologías de la Información & 97 & 21.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Demanda acumulada por énfasis, 2021--2025}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/dashboard1_tasa_reprobacion_cursos.png}
+    \caption{Cursos con mayor tasa de reprobación}
+    \label{fig:dashboard1-tasa-reprobacion-cursos}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/dashboard1_cantidad_reprobados.png}
+    \caption{Cantidad de reprobados por curso}
+    \label{fig:dashboard1-cantidad-reprobados}
+\end{figure}
+
+\subsubsection{Cursos con mayor tasa de reprobación}
+
+Los datos de reprobación en los cursos del tronco común muestran cuáles son los más difíciles para los estudiantes:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Curso} & \textbf{Matriculados} & \textbf{Reprobados} & \textbf{Tasa (\%)} \\
+\midrule
+Cálculo diferencial e integral & 1{,}218 & 432 & 35.47 \\
+Álgebra lineal & 980 & 289 & 29.49 \\
+Programación paralela y concurrente & 682 & 197 & 28.89 \\
+Estructuras discretas & 1{,}162 & 289 & 24.87 \\
+Análisis de algoritmos y estr. de datos & 823 & 201 & 24.42 \\
+Lenguaje Ensamblador & 878 & 195 & 22.21 \\
+Probabilidad y estadística & 775 & 164 & 21.16 \\
+Fundamentos de arquitectura & 1{,}025 & 183 & 17.85 \\
+Programación & 1{,}348 & 185 & 13.72 \\
+Introducción a la matemática para computación & 1{,}348 & 149 & 11.05 \\
+\bottomrule
+\end{tabular}
+\caption{Cursos ordenados por tasa de reprobación (datos simulados)}
+\end{table}
+
+\textbf{Hallazgos clave:}
+\begin{itemize}
+  \item Los cursos con más reprobación son los matemáticos: Cálculo diferencial e integral (35.47\%) y Álgebra lineal (29.49\%).
+  \item Cálculo diferencial e integral también tiene la mayor cantidad total de reprobados (432), lo que lo hace el curso con mayor efecto en la permanencia estudiantil.
+  \item Programación paralela y concurrente ocupa el tercer lugar en tasa (28.89\%) a pesar de tener la menor cantidad de matriculados (682), lo que indica que es un curso difícil por sí mismo.
+  \item Los cursos de primer ingreso (Programación, Introducción a la matemática para computación) tienen tasas bajas (11--14\%) aunque manejan grandes cantidades de estudiantes (1{,}348 cada uno).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/dashboard1_matriculados_vs_reprobados.png}
+    \caption{Matriculados versus reprobados por curso}
+    \label{fig:dashboard1-matriculados-vs-reprobados}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{img/dashboard1_tasa_reprobacion_ciclo.png}
+    \caption{Tasa de reprobación promedio por ciclo lectivo}
+    \label{fig:dashboard1-tasa-reprobacion-ciclo}
+\end{figure}
+
+\subsubsection{Tasa de reprobación por ciclo}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Período} & \textbf{Matriculados} & \textbf{Reprobados} & \textbf{Tasa promedio (\%)} \\
+\midrule
+I-2021 & 925 & 199 & 22 \\
+II-2021 & 889 & 186 & 21 \\
+I-2022 & 990 & 223 & 23 \\
+II-2022 & 951 & 207 & 22 \\
+III-2022 & 300 & 64 & 21 \\
+I-2023 & 1{,}023 & 234 & 23 \\
+II-2023 & 971 & 210 & 22 \\
+I-2024 & 1{,}058 & 248 & 23 \\
+II-2024 & 1{,}003 & 221 & 22 \\
+I-2025 & 1{,}093 & 261 & 24 \\
+II-2025 & 1{,}036 & 231 & 22 \\
+\bottomrule
+\end{tabular}
+\caption{Tasa de reprobación promedio por ciclo lectivo}
+\end{table}
+
+La tasa de reprobación promedio se mantiene estable durante todo el período, entre 21\% y 24\%. El valor más alto se da en I-2025 (24\%), y los más bajos en II-2021 y III-2022 (21\%). No se ve una tendencia clara de mejora ni de empeoramiento. Es importante notar que la cantidad de matriculados crece de forma constante (de 925 en I-2021 a 1{,}093 en I-2025), lo que significa que el número total de reprobados también sube en la misma proporción.
+
+\subsubsection{Conclusiones y recomendaciones}
+
+\begin{enumerate}
+  \item \textbf{Planificación de grupos para IS:} Con 204 estudiantes en el período (44.2\% del total), Ingeniería de Software es el énfasis más popular. Se recomienda mantener capacidad para al menos 40--48 estudiantes por año.
+  \item \textbf{Crecimiento de CC:} Ciencias de la Computación triplicó su demanda de 14 (2021) a 44 (2024). Esto sugiere abrir más grupos en cursos propios de este énfasis.
+  \item \textbf{Inestabilidad de ITI:} Con una caída a 7 estudiantes en 2023 (solo 1 en II Ciclo) y una recuperación a 35 en 2024, se recomienda investigar las causas de estos cambios bruscos para poder planificar mejor.
+  \item \textbf{Atención a cursos críticos:} Cálculo diferencial e integral (35.47\%, 432 reprobados) y Álgebra lineal (29.49\%, 289 reprobados) necesitan atención prioritaria. Se sugiere evaluar tutorías o cambios en la forma de evaluación.
+  \item \textbf{Seguimiento continuo:} La tasa de reprobación general se ha mantenido entre 21--24\% durante 11 ciclos sin mejora; se recomienda fijar metas de reducción gradual.
+\end{enumerate}
+
 \subsection{Reporte 2: Impacto de Actividades de Orientación}
 
 Soporte del Dashboard 2. Comparación del impacto y utilidad de cada actividad entre ciclos, segmentado por énfasis elegido. Incluye análisis de si la asistencia a actividades se correlaciona con la elección final, y recomendaciones sobre qué actividades mantener, rediseñar o descontinuar.
