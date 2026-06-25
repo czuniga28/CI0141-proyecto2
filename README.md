@@ -179,8 +179,8 @@ Metabase forma parte del arranque completo (`docker compose up -d`) y queda en
 (`dw`). Depende del servicio `etl` (`service_completed_successfully`), así que al
 abrirlo los dashboards ya encuentran datos.
 
-Los dashboards se almacenan en una base **H2 versionada en git** bajo
-`./metabase-data` (bind mount), de modo que se comparten por el repositorio y
-sobreviven a `docker compose down -v`. Tras recrear el `dw` desde cero, Metabase
-puede tardar ~1 min en re-sincronizar el esquema; las referencias de los
-dashboards son por nombre de tabla/columna, así que se mantienen.
+Metabase queda disponible en [http://localhost:3000](http://localhost:3000),
+conectado al Data Warehouse (`dw`) para dashboards. Antes de iniciar Metabase,
+el servicio `metabase-db-init` crea de forma idempotente la base `metabase`,
+donde Metabase guarda su configuración interna. Esto funciona también cuando
+el volumen de PostgreSQL ya existe.
