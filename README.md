@@ -10,31 +10,40 @@ estrella, para análisis en Metabase.
 - Python 3.11+
 - `pip install -r requirements.txt`
 
-## 1. Levantar la base de datos (Data Warehouse)
+## 1. Arranque completo (DW + ETL + Metabase)
 
 ```bash
-docker compose up -d dw
+docker compose up -d
 ```
 
-Esto inicia un contenedor de PostgreSQL (`ecci_dw`) y ejecuta automáticamente
-los scripts de `sql/ddl/` (esquemas `staging` y `dw`, dimensiones, hechos,
-vistas y seeds) en el primer arranque.
+Un solo comando levanta todo y deja el sistema listo, **sin pasos manuales**:
 
-Verificar que esté listo:
+1. `dw` — PostgreSQL (`ecci_dw`); en el primer arranque corre los scripts de
+   `sql/ddl/` (esquemas `staging`/`dw`, dimensiones, hechos, vistas y seeds).
+2. `etl` — contenedor one-shot que corre el pipeline ETL (`python -m etl.main`)
+   contra el DW y termina. Es idempotente (full reload), así que repuebla los
+   hechos en cada `up`.
+3. `metabase` — espera a que el ETL termine y queda en
+   [http://localhost:3000](http://localhost:3000) con los dashboards
+   (almacenados en H2 versionado bajo `./metabase-data`).
+
+Verificar que el DW esté listo / que el ETL haya terminado:
 
 ```bash
 docker compose exec dw pg_isready -U etl_user -d ecci_dw
+docker compose logs etl          # debe terminar en exit 0 e imprimir filas insertadas
 ```
 
-> El puerto publicado está definido en `docker-compose.yml` (actualmente
-> `5434:5432`). Si usás un puerto distinto a 5432, exportá `POSTGRES_PORT`
-> antes de correr el ETL (ver siguiente sección).
+> El puerto publicado del DW está definido en `docker-compose.yml`
+> (`5432:5432`). El servicio `etl` se conecta a `dw:5432` por la red interna de
+> Compose, así que no depende del puerto publicado en el host.
 
-Para reiniciar desde cero (borra todos los datos y vuelve a correr los DDL):
+Para reiniciar el warehouse desde cero (borra `dw_data` y vuelve a correr
+DDL + ETL; los dashboards en `./metabase-data` son bind mount y **sobreviven**):
 
 ```bash
 docker compose down -v
-docker compose up -d dw
+docker compose up -d
 ```
 
 ## 2. Configuración del ETL
@@ -55,7 +64,11 @@ Ejemplo si el contenedor publica el puerto `5434`:
 export POSTGRES_PORT=5434
 ```
 
-## 3. Correr el ETL completo
+## 3. Correr el ETL manualmente (opcional)
+
+> Con `docker compose up -d` el ETL ya corre automáticamente (servicio `etl`).
+> Este paso solo es necesario para depurar o re-correr el pipeline desde el host
+> contra un DW ya levantado.
 
 ```bash
 python -m etl.main
@@ -159,11 +172,15 @@ docker compose exec dw psql -U etl_user -d ecci_dw -c "
 "
 ```
 
-## 6. Servicios adicionales
+## 6. Metabase
 
-```bash
-docker compose up -d metabase
-```
+Metabase forma parte del arranque completo (`docker compose up -d`) y queda en
+[http://localhost:3000](http://localhost:3000), conectado al Data Warehouse
+(`dw`). Depende del servicio `etl` (`service_completed_successfully`), así que al
+abrirlo los dashboards ya encuentran datos.
 
-Metabase queda disponible en [http://localhost:3000](http://localhost:3000),
-conectado al Data Warehouse (`dw`) para dashboards.
+Los dashboards se almacenan en una base **H2 versionada en git** bajo
+`./metabase-data` (bind mount), de modo que se comparten por el repositorio y
+sobreviven a `docker compose down -v`. Tras recrear el `dw` desde cero, Metabase
+puede tardar ~1 min en re-sincronizar el esquema; las referencias de los
+dashboards son por nombre de tabla/columna, así que se mantienen.

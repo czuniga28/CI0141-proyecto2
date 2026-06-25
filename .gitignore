@@ -223,3 +223,8 @@ __marimo__/
 metabase-data/metabase.db/*.trace.db
 metabase-data/metabase.db/*.lock.db
 metabase-data/metabase.db/*.tmp.db
+# Archivos H2 top-level obsoletos (config vieja); el H2 vivo está en metabase.db/
+metabase-data/*.trace.db
+metabase-data/*.lock.db
+metabase-data/*.tmp.db
+metabase-data/metabase.db.mv.db
