@@ -8,7 +8,7 @@ from collections.abc import Callable
 from etl.config import EtlConfig, load_config
 from etl.extract import csv_source, json_source, relational_source
 from etl.extract import clean_staging
-from etl.transform import dim_tiempo, load_facts
+from etl.load import dim_tiempo, facts
 
 
 EtlStep = tuple[str, Callable[[EtlConfig], None]]
@@ -20,8 +20,8 @@ ETL_STEPS: list[EtlStep] = [
     ("csv_to_raw_staging", csv_source.run),
     ("relational_extract_to_staging", relational_source.extract_to_staging),
     ("json_extract_to_staging", json_source.extract_to_staging),
-    ("transform_dim_tiempo", dim_tiempo.run),
-    ("transform_load_facts", load_facts.run),
+    ("load_dim_tiempo", dim_tiempo.run),
+    ("load_facts", facts.run),
 ]
 
 

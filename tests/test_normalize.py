@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from etl.transform import normalize as nz
 from etl.extract.common import SOURCE_COLUMNS
-from etl.transform.load_facts import _FACT_TABLES
+from etl.load.facts import _FACT_TABLES
 
 
 class TransformRegressionTests(unittest.TestCase):
